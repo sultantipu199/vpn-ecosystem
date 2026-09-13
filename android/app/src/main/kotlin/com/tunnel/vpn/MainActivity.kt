@@ -3,6 +3,7 @@ package com.tunnel.vpn
 import android.app.Activity
 import android.content.Intent
 import android.net.VpnService
+import android.os.Build
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -16,11 +17,11 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "startVpn" -> {
-                    val intent = VpnService.prepare(this)
-                    if (intent != null) {
-                        startActivityForResult(intent, VPN_REQUEST_CODE)
+                    val prepareIntent = VpnService.prepare(this)
+                    if (prepareIntent != null) {
+                        startActivityForResult(prepareIntent, VPN_REQUEST_CODE)
                     } else {
-                        startService(Intent(this, TunnelVpnService::class.java))
+                        launchTunnelService()
                     }
                     result.success(true)
                 }
@@ -33,4 +34,21 @@ class MainActivity : FlutterActivity() {
             }
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            launchTunnelService()
+        }
+    }
+
+    private fun launchTunnelService() {
+        val intent = Intent(this, TunnelVpnService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
+    }
 }
+

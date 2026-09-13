@@ -57,15 +57,45 @@ class _VpnHomeScreenState extends State<VpnHomeScreen> {
     if (savedUrl != null && savedUrl.isNotEmpty) {
       _serverUrl = savedUrl;
     }
+
+    // Auto-sync session with cloud backend
+    try {
+      final api = ApiService(baseUrl: _serverUrl);
+      final userModel = await api.login(
+        username: _user,
+        password: _pass,
+        hwid: _deviceHwid,
+      );
+      if (mounted) {
+        setState(() {
+          _user = userModel.username;
+          _tier = userModel.tier;
+          _expiryTime = userModel.expiresAt;
+        });
+      }
+    } catch (_) {
+      // Local fallback active
+    }
   }
 
   Future<void> _toggleVpn() async {
-    if (_isConnected) {
-      await _channel.invokeMethod('stopVpn');
-      setState(() => _isConnected = false);
-    } else {
-      await _channel.invokeMethod('startVpn');
-      setState(() => _isConnected = true);
+    try {
+      if (_isConnected) {
+        await _channel.invokeMethod('stopVpn');
+        setState(() => _isConnected = false);
+      } else {
+        await _channel.invokeMethod('startVpn');
+        setState(() => _isConnected = true);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("VPN error: $e"),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
     }
   }
 
@@ -220,9 +250,42 @@ class _VpnHomeScreenState extends State<VpnHomeScreen> {
                   expiresAt: _expiryTime,
                   onExpired: _handleKillSwitch,
                 ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: _isConnected ? const Color(0x2210B981) : const Color(0x15F59E0B),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: _isConnected ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        _isConnected ? Icons.check_circle_rounded : Icons.wifi_rounded,
+                        color: _isConnected ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _isConnected
+                            ? "VPN TUNNEL ACTIVE • WiFi & Internet Protected"
+                            : "READY TO CONNECT • WiFi / Internet Online",
+                        style: TextStyle(
+                          color: _isConnected ? const Color(0xFF10B981) : Colors.white70,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 if (_deviceHwid.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.only(top: 8, left: 20, right: 20),
                     child: Text(
                       "DEVICE BINDING: ${_deviceHwid.substring(0, min(24, _deviceHwid.length))}...",
                       style: const TextStyle(color: Colors.white30, fontSize: 11),

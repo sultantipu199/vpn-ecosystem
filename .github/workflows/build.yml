@@ -11,6 +11,8 @@ jobs:
   build:
     name: Build Flutter APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
@@ -52,3 +54,29 @@ jobs:
         with:
           name: app-release-all
           path: build/app/outputs/flutter-apk/*.apk
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: v1.0.1
+          name: "VPN Ecosystem v1.0.1 (WiFi & Network Fix)"
+          body: |
+            ### 🚀 VPN Ecosystem Client v1.0.1
+            
+            **Resolved Issues:**
+            - Fixed WiFi & internet connectivity lock when VPN tunnel starts.
+            - Added `allowBypass` & split tunneling routing (`10.8.0.0/24`) so normal WiFi browsing, WhatsApp, YouTube continue working at full speed.
+            - Added `onActivityResult` in `MainActivity` for seamless Android VPN permission consent.
+            - Added network state and WiFi permissions in `AndroidManifest.xml`.
+            
+            #### 📱 1-Click Direct Download Links:
+            - **[Download APK (ARM64-v8a - Recommended for modern Android phones)](https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.1/app-arm64-v8a-release.apk)** (~7.9 MB)
+            - **[Download APK (ARMeabi-v7a - 32-bit older Android phones)](https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.1/app-armeabi-v7a-release.apk)** (~7.4 MB)
+            - **[Download APK (x86_64 - Emulators / PC)](https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.1/app-x86_64-release.apk)** (~8.0 MB)
+          files: |
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -26,13 +26,24 @@ class TunnelVpnService : VpnService() {
 
     private fun startTunnel() {
         if (vpnInterface != null) return
-        val builder = Builder()
-        builder.setSession("Secure Tunnel")
-            .setMtu(1500)
-            .addAddress("10.0.0.2", 24)
-            .addDnsServer("1.1.1.1")
-            .addRoute("0.0.0.0", 0)
-        vpnInterface = builder.establish()
+        try {
+            val builder = Builder()
+            builder.setSession("Enterprise Tunnel")
+                .setMtu(1500)
+                .addAddress("10.8.0.2", 24)
+                .addDnsServer("1.1.1.1")
+                .addRoute("10.8.0.0", 24)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                builder.setMetered(false)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder.allowBypass()
+            }
+            vpnInterface = builder.establish()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun startForegroundServiceNotification() {

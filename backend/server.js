@@ -36,6 +36,22 @@ db.serialize(() => {
     sni TEXT,
     is_active INTEGER DEFAULT 1
   )`);
+
+  // Auto-seed default demo account (1 Year validity)
+  const defaultExpiry = Date.now() + (365 * 24 * 60 * 60 * 1000);
+  db.run(
+    `INSERT OR IGNORE INTO users (username, password, tier, duration_minutes, expires_at, is_active) 
+     VALUES ('232248', '08859', 'VIP Enterprise', 525600, ?, 1)`,
+    [defaultExpiry]
+  );
+
+  // Auto-seed default gateway server
+  db.get(`SELECT COUNT(*) as count FROM servers`, [], (err, row) => {
+    if (!err && row && row.count === 0) {
+      db.run(`INSERT INTO servers (name, protocol, host, port, sni, is_active) 
+              VALUES ('US Cloud Gateway (Low Ping)', 'Shadowsocks / V2Ray', 'vpn-license-backend.onrender.com', 443, 'vpn-license-backend.onrender.com', 1)`);
+    }
+  });
 });
 
 // Admin Dashboard Web Page
@@ -48,18 +64,18 @@ app.get('/', (req, res) => {
   res.redirect('/admin');
 });
 
-// 1-Click Direct APK Downloads
+// 1-Click Direct APK Downloads (Points to latest release automatically)
 app.get('/download', (req, res) => {
-  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-arm64-v8a-release.apk');
+  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/latest/download/app-arm64-v8a-release.apk');
 });
 app.get('/download/arm64', (req, res) => {
-  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-arm64-v8a-release.apk');
+  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/latest/download/app-arm64-v8a-release.apk');
 });
 app.get('/download/armv7', (req, res) => {
-  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-armeabi-v7a-release.apk');
+  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/latest/download/app-armeabi-v7a-release.apk');
 });
 app.get('/download/x86_64', (req, res) => {
-  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-x86_64-release.apk');
+  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/latest/download/app-x86_64-release.apk');
 });
 
 // Health check & Server status
