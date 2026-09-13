@@ -1,0 +1,27 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+# Node
+node_modules/
+npm-debug.log
+backend/database.sqlite
+
+# Android
+.gradle/
+local.properties
+**/android/**/gradle-app.setting
+**/android/**/captures/
+**/android/**/gradle/wrapper/gradle-wrapper.jar
+**/.idea/
+**/*.iml
+
+# System & OS
+.DS_Store
+Thumbs.db
+*.log
