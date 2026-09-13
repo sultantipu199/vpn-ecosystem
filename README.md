@@ -5,12 +5,13 @@ Anyone can download the compiled production APK directly without logging into Gi
 
 | Architecture | Device Type | Direct 1-Click Download | File Size |
 |---|---|---|---|
-| **ARM64 (v8a)** *(Recommended)* | Modern Android Phones (95%+) | **[⬇️ Download APK](https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-arm64-v8a-release.apk)** | ~7.9 MB |
-| **ARMeabi (v7a)** | Older 32-bit Android Phones | **[⬇️ Download APK](https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-armeabi-v7a-release.apk)** | ~7.4 MB |
-| **x86_64** | Emulators / ChromeOS | **[⬇️ Download APK](https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-x86_64-release.apk)** | ~8.0 MB |
+| **ARM64 (v8a)** *(Recommended)* | Modern Android Phones (95%+) | **[⬇️ Download APK (v1.0.1 - WiFi Fixed)](https://github.com/sultantipu199/vpn-ecosystem/releases/latest/download/app-arm64-v8a-release.apk)** | ~7.9 MB |
+| **ARMeabi (v7a)** | Older 32-bit Android Phones | **[⬇️ Download APK (v1.0.1 - WiFi Fixed)](https://github.com/sultantipu199/vpn-ecosystem/releases/latest/download/app-armeabi-v7a-release.apk)** | ~7.4 MB |
+| **x86_64** | Emulators / ChromeOS | **[⬇️ Download APK (v1.0.1 - WiFi Fixed)](https://github.com/sultantipu199/vpn-ecosystem/releases/latest/download/app-x86_64-release.apk)** | ~8.0 MB |
 
 > 🌐 **Live Cloud Backend & Admin Panel**: [https://vpn-license-backend.onrender.com/admin](https://vpn-license-backend.onrender.com/admin)  
-> 🔗 **Direct APK Download Route**: [https://vpn-license-backend.onrender.com/download](https://vpn-license-backend.onrender.com/download)
+> 🔗 **Direct APK Download Route**: [https://vpn-license-backend.onrender.com/download](https://vpn-license-backend.onrender.com/download)  
+> 📦 **Release Notes & Changelog**: [GitHub Releases (v1.0.1)](https://github.com/sultantipu199/vpn-ecosystem/releases/tag/v1.0.1)
 
 ---
 
