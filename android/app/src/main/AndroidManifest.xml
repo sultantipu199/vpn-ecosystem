@@ -8,7 +8,11 @@
 
     <application
         android:label="Enterprise VPN"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@android:drawable/sym_def_app_icon">
+
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
         
         <activity
             android:name=".MainActivity"
@@ -28,6 +32,9 @@
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:foregroundServiceType="specialUse"
             android:exported="false">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="VPN Tunnel Routing Service"/>
             <intent-filter>
                 <action android:name="android.net.VpnService"/>
             </intent-filter>
