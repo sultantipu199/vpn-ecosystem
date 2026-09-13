@@ -10,8 +10,8 @@ RUN apk add --no-cache python3 make g++ \
     && npm install --production \
     && apk del python3 make g++
 
-# Copy server code
-COPY server.js ./
+# Copy server code and public assets
+COPY . .
 
 # Expose port
 EXPOSE 3000
