@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise VPN Control Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #09090f;
+      --card-bg: #12121e;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --accent-glow: rgba(245, 158, 11, 0.25);
+      --success: #10b981;
+      --danger: #ef4444;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.06) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.06) 0%, transparent 40%);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      padding-bottom: 50px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .badge-live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--success);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 20px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+      box-shadow: 0 0 10px var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .stat-num {
+      font-size: 26px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Main Content Layout */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 960px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card Styling */
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .panel-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-field, .select-field {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .input-field:focus, .select-field:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .btn-secondary-sm {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      border-radius: 10px;
+      padding: 0 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .btn-secondary-sm:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      font-weight: 700;
+      font-size: 15px;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px var(--accent-glow);
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* Duration Quick Buttons */
+    .quick-durations {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .quick-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .quick-btn:hover, .quick-btn.active {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Users Table Area */
+    .search-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .search-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th {
+      color: var(--text-muted);
+      font-weight: 600;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--card-border);
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .user-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .username-txt {
+      font-weight: 700;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+    }
+
+    .password-txt {
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .badge-tier {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-tier.VIP {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border-color: rgba(168, 85, 247, 0.4);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .status-badge.active {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    .status-badge.expired {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .status-badge.suspended {
+      background: rgba(156, 163, 175, 0.15);
+      color: #9ca3af;
+    }
+
+    .hwid-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hwid-unlocked {
+      color: #10b981;
+      font-size: 11px;
+    }
+
+    .actions-col {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .action-btn.btn-unlock {
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .action-btn.btn-unlock:hover {
+      background: rgba(56, 189, 248, 0.15);
+    }
+
+    .action-btn.btn-del {
+      color: #f87171;
+      border-color: rgba(248, 113, 113, 0.3);
+    }
+    .action-btn.btn-del:hover {
+      background: rgba(248, 113, 113, 0.15);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: #1f2937;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 1000;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      animation: slideUp 0.2s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo-area">
+        <div class="logo-badge">🛡️</div>
+        <div>
+          <div class="brand-title">Enterprise VPN Control Panel</div>
+          <div class="brand-subtitle">Automated HWID Device Lock & License Management</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="badge-live">
+          <div class="dot"></div> Server Online
+        </div>
+        <button class="btn-secondary-sm" onclick="fetchUsers()">🔄 Refresh</button>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div>
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">Total Accounts</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🟢</div>
+        <div>
+          <div class="stat-num" id="stat-active" style="color: var(--success);">0</div>
+          <div class="stat-label">Active Users</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div>
+          <div class="stat-num" id="stat-expired" style="color: var(--danger);">0</div>
+          <div class="stat-label">Expired Accounts</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📱</div>
+        <div>
+          <div class="stat-num" id="stat-locked" style="color: #38bdf8;">0</div>
+          <div class="stat-label">Locked Devices (HWID)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+      <!-- Create Account Card -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">⚡ Create VPN Account</div>
+        </div>
+
+        <form id="createForm" onsubmit="handleCreateUser(event)">
+          <div class="form-group">
+            <label class="form-label">Username</label>
+            <div class="input-row">
+              <input type="text" id="username" class="input-field" placeholder="e.g. client101" required>
+              <button type="button" class="btn-secondary-sm" onclick="randomizeUser()">🎲 Random</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <div class="input-row">
+              <input type="text" id="password" class="input-field" placeholder="Password" required>
+              <button type="button" class="btn-secondary-sm" onclick="randomizePass()">🎲 Random</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Duration (Validity)</label>
+            <select id="duration" class="select-field" onchange="handleDurationChange()">
+              <option value="60">1 Hour (Trial)</option>
+              <option value="1440">1 Day (24 Hours)</option>
+              <option value="10080">7 Days (1 Week)</option>
+              <option value="21600">15 Days</option>
+              <option value="43200" selected>30 Days (1 Month)</option>
+              <option value="129600">90 Days (3 Months)</option>
+              <option value="525600">365 Days (1 Year)</option>
+            </select>
+            <div class="quick-durations">
+              <button type="button" class="quick-btn" onclick="setQuickDuration(60, this)">1 Hour</button>
+              <button type="button" class="quick-btn" onclick="setQuickDuration(1440, this)">1 Day</button>
+              <button type="button" class="quick-btn" onclick="setQuickDuration(10080, this)">7 Days</button>
+              <button type="button" class="quick-btn active" onclick="setQuickDuration(43200, this)">30 Days</button>
+              <button type="button" class="quick-btn" onclick="setQuickDuration(129600, this)">90 Days</button>
+              <button type="button" class="quick-btn" onclick="setQuickDuration(525600, this)">1 Year</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tier / Package</label>
+            <select id="tier" class="select-field">
+              <option value="Premium" selected>Premium</option>
+              <option value="VIP">VIP Elite</option>
+              <option value="Basic">Basic</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-primary" id="createBtn">
+            <span>➕ Generate & Copy Account</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Users List Card -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">📋 Active Subscriptions</div>
+          <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search username, tier or HWID..." oninput="renderTable()">
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>User / Pass</th>
+                <th>Package</th>
+                <th>Expiration</th>
+                <th>Device HWID</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading accounts...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast">Message</div>
+
+  <script>
+    let allUsers = [];
+
+    async function fetchUsers() {
+      try {
+        const res = await fetch('/api/admin/users');
+        allUsers = await res.json();
+        updateStats();
+        renderTable();
+      } catch (e) {
+        showToast("Error loading users: " + e.message, true);
+      }
+    }
+
+    function updateStats() {
+      const now = Date.now();
+      const total = allUsers.length;
+      const active = allUsers.filter(u => u.is_active && u.expires_at > now).length;
+      const expired = allUsers.filter(u => u.expires_at <= now).length;
+      const locked = allUsers.filter(u => u.hwid).length;
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-active').textContent = active;
+      document.getElementById('stat-expired').textContent = expired;
+      document.getElementById('stat-locked').textContent = locked;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('userTableBody');
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const now = Date.now();
+
+      const filtered = allUsers.filter(u => {
+        return u.username.toLowerCase().includes(search) ||
+               u.tier.toLowerCase().includes(search) ||
+               (u.hwid && u.hwid.toLowerCase().includes(search));
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">No accounts found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(u => {
+        const isExpired = now > u.expires_at;
+        const remainingHours = Math.round((u.expires_at - now) / (1000 * 60 * 60));
+        let remainingTxt = isExpired ? 'Expired' : (remainingHours > 24 ? Math.round(remainingHours / 24) + ' days left' : remainingHours + ' hrs left');
+        const expireDate = new Date(u.expires_at).toLocaleDateString() + ' ' + new Date(u.expires_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <tr>
+            <td>
+              <div class="user-col">
+                <span class="username-txt">${escapeHtml(u.username)}</span>
+                <span class="password-txt">🔑 ${escapeHtml(u.password)}</span>
+              </div>
+            </td>
+            <td>
+              <span class="badge-tier ${u.tier}">${escapeHtml(u.tier)}</span>
+            </td>
+            <td>
+              <div style="font-size: 12px; font-weight: 600; color: ${isExpired ? 'var(--danger)' : '#fff'};">${remainingTxt}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">${expireDate}</div>
+            </td>
+            <td>
+              ${u.hwid ? `
+                <span class="hwid-tag" title="${escapeHtml(u.hwid)}">🔒 ${escapeHtml(u.hwid.substring(0, 14))}...</span>
+              ` : `
+                <span class="hwid-unlocked">🔓 Not bound yet</span>
+              `}
+            </td>
+            <td>
+              ${!u.is_active ? `
+                <span class="status-badge suspended">Suspended</span>
+              ` : isExpired ? `
+                <span class="status-badge expired">Expired</span>
+              ` : `
+                <span class="status-badge active">Active</span>
+              `}
+            </td>
+            <td>
+              <div class="actions-col">
+                <button class="action-btn" title="Copy User:Pass" onclick="copyCreds('${escapeHtml(u.username)}', '${escapeHtml(u.password)}')">📋</button>
+                ${u.hwid ? `
+                  <button class="action-btn btn-unlock" title="Unlock phone/device (Reset HWID)" onclick="resetHwid(${u.id})">🔓 Unlock</button>
+                ` : ''}
+                <button class="action-btn" title="${u.is_active ? 'Suspend' : 'Activate'}" onclick="toggleStatus(${u.id}, ${u.is_active ? 0 : 1})">
+                  ${u.is_active ? '⏸️' : '▶️'}
+                </button>
+                <button class="action-btn btn-del" title="Delete Account" onclick="deleteUser(${u.id}, '${escapeHtml(u.username)}')">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function handleCreateUser(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const duration = document.getElementById('duration').value;
+      const tier = document.getElementById('tier').value;
+
+      try {
+        const res = await fetch('/api/admin/create-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, duration_minutes: duration, tier })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showToast(`Account created: ${username}!`);
+          copyCreds(username, password);
+          randomizeUser();
+          randomizePass();
+          fetchUsers();
+        } else {
+          showToast(data.error || 'Failed to create user', true);
+        }
+      } catch (err) {
+        showToast('Network error: ' + err.message, true);
+      }
+    }
+
+    async function resetHwid(id) {
+      if (!confirm('Unlock device? The user will be able to log in on a new device.')) return;
+      try {
+        const res = await fetch('/api/admin/reset-hwid', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        showToast(data.message);
+        fetchUsers();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    async function toggleStatus(id, newStatus) {
+      try {
+        const res = await fetch('/api/admin/toggle-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, is_active: newStatus })
+        });
+        const data = await res.json();
+        showToast(data.message);
+        fetchUsers();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    async function deleteUser(id, name) {
+      if (!confirm(`Are you sure you want to permanently delete user "${name}"?`)) return;
+      try {
+        const res = await fetch('/api/admin/delete-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        showToast(data.message);
+        fetchUsers();
+      } catch (err) {
+        showToast(err.message, true);
+      }
+    }
+
+    function randomizeUser() {
+      const num = Math.floor(100000 + Math.random() * 900000);
+      document.getElementById('username').value = 'vpn' + num;
+    }
+
+    function randomizePass() {
+      const chars = 'abcdefghjkmnpqrstuvwxyz23456789';
+      let pass = '';
+      for (let i = 0; i < 6; i++) {
+        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      document.getElementById('password').value = pass;
+    }
+
+    function setQuickDuration(mins, btn) {
+      document.getElementById('duration').value = mins;
+      document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+      if (btn) {
+        btn.classList.add('active');
+      }
+    }
+
+    function handleDurationChange() {
+      const val = document.getElementById('duration').value;
+      document.querySelectorAll('.quick-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+    }
+
+    function copyCreds(u, p) {
+      const text = `Username: ${u}\nPassword: ${p}`;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`Copied to clipboard:\n${u} / ${p}`);
+      });
+    }
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.background = isError ? '#991b1b' : '#065f46';
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Init
+    randomizeUser();
+    randomizePass();
+    fetchUsers();
+    setInterval(fetchUsers, 15000); // Auto-refresh every 15s
+  </script>
+</body>
+</html>
