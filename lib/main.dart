@@ -30,7 +30,7 @@ class _VpnHomeScreenState extends State<VpnHomeScreen> {
   String _pass = "08859";
   String _tier = "Premium";
   late int _expiryTime;
-  String _serverUrl = "http://10.0.2.2:3000";
+  String _serverUrl = "https://vpn-license-backend.onrender.com";
   String _deviceHwid = "";
 
   @override

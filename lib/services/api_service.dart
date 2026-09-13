@@ -5,7 +5,7 @@ import '../models/user_model.dart';
 class ApiService {
   final String baseUrl;
 
-  ApiService({this.baseUrl = 'http://10.0.2.2:3000'}); // 10.0.2.2 for Android emulator to localhost
+  ApiService({this.baseUrl = 'https://vpn-license-backend.onrender.com'});
 
   Future<UserModel> login({
     required String username,
