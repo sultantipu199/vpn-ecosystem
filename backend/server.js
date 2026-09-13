@@ -1,11 +1,16 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
-const app = express();
+const cors = require('cors');
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
 app.use(express.json());
 
 const db = new sqlite3.Database('./database.sqlite', (err) => {
-  if (err) console.error(err.message);
+  if (err) console.error('Database connection error:', err.message);
+  else console.log('Connected to SQLite database.');
 });
 
 db.serialize(() => {
@@ -31,18 +36,41 @@ db.serialize(() => {
   )`);
 });
 
+// Health check & Server status
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'Enterprise VPN Licensing Engine',
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 // Admin Endpoint: তৈরি করুন অ্যাকাউন্ট (যেমন: 60 mins বা 43200 mins = 30 days)
 app.post('/api/admin/create-user', (req, res) => {
   const { username, password, tier, duration_minutes } = req.body;
+
+  if (!username || !password || !duration_minutes) {
+    return res.status(400).json({ error: 'Username, password and duration_minutes are required' });
+  }
+
   const now = Date.now();
-  const expires_at = now + (duration_minutes * 60 * 1000);
+  const expires_at = now + (Number(duration_minutes) * 60 * 1000);
 
   db.run(
     `INSERT INTO users (username, password, tier, duration_minutes, expires_at) VALUES (?, ?, ?, ?, ?)`,
     [username, password, tier || 'Premium', duration_minutes, expires_at],
     function (err) {
       if (err) return res.status(400).json({ error: 'User already exists' });
-      res.json({ message: 'User created successfully', username, expires_at, tier });
+      res.json({
+        message: 'User created successfully',
+        username,
+        expires_at,
+        tier: tier || 'Premium'
+      });
     }
   );
 });
@@ -50,6 +78,10 @@ app.post('/api/admin/create-user', (req, res) => {
 // Client Login & Device HWID Binding Endpoint
 app.post('/api/auth', (req, res) => {
   const { username, password, hwid } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password required' });
+  }
 
   db.get(`SELECT * FROM users WHERE username = ? AND password = ?`, [username, password], (err, user) => {
     if (err || !user) return res.status(401).json({ error: 'Invalid credentials' });
@@ -62,7 +94,7 @@ app.post('/api/auth', (req, res) => {
 
     if (!user.hwid) {
       db.run(`UPDATE users SET hwid = ? WHERE id = ?`, [hwid, user.id]);
-    } else if (user.hwid !== hwid) {
+    } else if (hwid && user.hwid !== hwid) {
       return res.status(403).json({ error: 'Device bound to another HWID (Max 1 Device Allowed)' });
     }
 
@@ -77,4 +109,6 @@ app.post('/api/auth', (req, res) => {
   });
 });
 
-app.listen(3000, () => console.log('License Engine running on port 3000'));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`License Engine running on port ${PORT}`);
+});
