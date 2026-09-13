@@ -43,6 +43,25 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
+// Root route redirects to Admin Control Panel
+app.get('/', (req, res) => {
+  res.redirect('/admin');
+});
+
+// 1-Click Direct APK Downloads
+app.get('/download', (req, res) => {
+  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-arm64-v8a-release.apk');
+});
+app.get('/download/arm64', (req, res) => {
+  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-arm64-v8a-release.apk');
+});
+app.get('/download/armv7', (req, res) => {
+  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-armeabi-v7a-release.apk');
+});
+app.get('/download/x86_64', (req, res) => {
+  res.redirect('https://github.com/sultantipu199/vpn-ecosystem/releases/download/v1.0.0/app-x86_64-release.apk');
+});
+
 // Health check & Server status
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
